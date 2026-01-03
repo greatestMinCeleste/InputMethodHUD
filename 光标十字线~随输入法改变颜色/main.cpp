@@ -1,3 +1,11 @@
+// 十字线配置(单位: 像素)
+const int crosslinegap = 200; // 十字线距离鼠标中心的距离
+const int crosslineInnerThickness = 2; // 十字线内线粗细
+const int crosslineOuterThickness = 5; // 十字线外线粗细
+// 三角形配置(单位: 像素)
+const int triangleOffsetX = 16; const int triangleOffsetY = 12; // 三角形相对鼠标位置的偏移量 
+const int triangleLenthHalf = 8; // 三角形边长一半(大致上)
+
 #pragma execution_character_set("utf-8")
 #pragma comment(lib, "advapi32.lib")
 #include <windows.h>
@@ -27,8 +35,8 @@ bool g_showCross = true;
 bool g_showTriangle = false;
 
 COLORREF g_ColCN = RGB(241, 79, 95);   // 默认红
-COLORREF g_ColEN = RGB(0, 255, 148);   // 默认青绿
-COLORREF g_ColCAPS = RGB(255, 215, 0); // 默认金
+COLORREF g_ColEN = RGB(0, 101, 214);   // 默认蓝
+COLORREF g_ColCAPS = RGB(0, 255, 148); // 默认青绿
 const COLORREF COL_CORE = RGB(255, 255, 255);
 const COLORREF COL_KEY = RGB(0, 0, 0);
 
@@ -186,9 +194,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                 int monRight = mi.rcMonitor.right - vx;
                 int monTop = mi.rcMonitor.top - vy;
                 int monBottom = mi.rcMonitor.bottom - vy;
-                const int GAP = 200;
-                HPEN hPenBorder = CreatePen(PS_SOLID, 5, borderColor);
-                HPEN hPenCore = CreatePen(PS_SOLID, 2, COL_CORE);
+                const int GAP = crosslinegap;
+                HPEN hPenBorder = CreatePen(PS_SOLID, crosslineOuterThickness, borderColor);
+                HPEN hPenCore = CreatePen(PS_SOLID, crosslineInnerThickness, COL_CORE);
                 auto DrawLines = [&](HPEN pen) {
                     SelectObject(hMemDC, pen);
                     if (canvasY - GAP > monTop) { MoveToEx(hMemDC, canvasX, monTop, NULL); LineTo(hMemDC, canvasX, canvasY - GAP); }
@@ -204,8 +212,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                 HBRUSH hTriBrush = CreateSolidBrush(borderColor);
                 SelectObject(hMemDC, hTriBrush);
                 SelectObject(hMemDC, GetStockObject(NULL_PEN));
-                int tx = canvasX + 12; int ty = canvasY + 12;
-                POINT tri[] = { {tx + 12, ty}, {tx + 4, ty + 16}, {tx + 20, ty + 16} };
+                int tx = canvasX + triangleOffsetX; int ty = canvasY + triangleOffsetY;
+                POINT tri[] = { {tx + triangleLenthHalf, ty}, {tx, ty + triangleLenthHalf*2}, {tx + triangleLenthHalf*2, ty + triangleLenthHalf*2} };
                 Polygon(hMemDC, tri, 3);
                 DeleteObject(hTriBrush);
             }
